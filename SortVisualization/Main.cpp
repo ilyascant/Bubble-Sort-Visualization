@@ -66,7 +66,6 @@ private:
 	}
 
 	void createRectangle(int j, int n) {
-		auto heightClamp = [this](int x) { return (std::fmax(H * .01, std::fmin(H, (maxPercentage * vec[x])))); };
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
 		for (int x = 0; x < arrSize; x++)
@@ -100,15 +99,15 @@ private:
 
 				rectangle[0].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth, H);
 				rectangle[1].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth + rectangleWidth, H);
-				rectangle[2].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth, H - heightClamp(x));
-				rectangle[3].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth + rectangleWidth, H - heightClamp(x));
+				rectangle[2].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth, H - (maxPercentage * vec[x]));
+				rectangle[3].position = sf::Vector2f(rectangleWidth * .5 + 2 * x * rectangleWidth + rectangleWidth, H - (maxPercentage * vec[x]));
 			}
 			else
 			{
 				rectangle[0].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth, H);
 				rectangle[1].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth + rectangleWidth, H);
-				rectangle[2].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth, H - heightClamp(x));
-				rectangle[3].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth + rectangleWidth, H - heightClamp(x));
+				rectangle[2].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth, H - (maxPercentage * vec[x]));
+				rectangle[3].position = sf::Vector2f(rectangleWidth * .5 + x * rectangleWidth + rectangleWidth, H - (maxPercentage * vec[x]));
 			}
 
 			window->draw(rectangle);
