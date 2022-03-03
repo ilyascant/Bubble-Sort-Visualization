@@ -1,6 +1,6 @@
 ## This program uses SFML
 
-![2022-02-28 11-11-10_4 (1)](https://media.giphy.com/media/ix7ESSh9N8qMGPyNwQ/giphy.gif)
+![2022-02-28 11-11-10_4 (1)](![image](https://user-images.githubusercontent.com/79863003/156577823-ca7ae5c2-2f49-467e-8397-c9d183aec059.png))
 
 ### W - Add 20.
 ### S - Remove 20.
