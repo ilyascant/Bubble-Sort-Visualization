@@ -26,6 +26,30 @@ private:
 	int delay = 10;
 
 
+	void swap(int* x, int* y)
+	{
+		int temp = *x;
+		*x = *y;
+		*y = temp;
+	}
+	void shuffle(std::vector<int>& _vec) {
+		std::srand(time(NULL));
+		for (int times = 0; times < 4; times++)
+		{
+			for (int i = 0; i < _vec.size(); i++)
+			{
+				int randNumber = rand() % _vec.size();
+				swap(&_vec[randNumber], &_vec[i]);
+			}
+		}
+	}
+	void sortSettings(int cyanRectangle, int yellowRectangle) {
+		control();
+		window->clear();
+		createRectangle(cyanRectangle, yellowRectangle);
+		window->display();
+	}
+
 	class BubbleSort {
 
 	public:
@@ -33,18 +57,6 @@ private:
 		Sort& parent;
 
 		BubbleSort(Sort& _parent) : parent(_parent) {};
-
-		void shuffle(std::vector<int>& _vec) {
-			std::srand(time(NULL));
-			for (int times = 0; times < 4; times++)
-			{
-				for (int i = 0; i < _vec.size(); i++)
-				{
-					int randNumber = rand() % _vec.size();
-					swap(&_vec[randNumber], &_vec[i]);
-				}
-			}
-		}
 
 		void swap(int* x, int* y)
 		{
@@ -59,13 +71,10 @@ private:
 
 			for (int i = 0; i < n - 1; i++)
 			{
+				if (parent.replay == true) break;
 				for (int j = 0; j < n - i - 1; j++) {
 					if (parent.replay == true) break;
-					parent.control();
-
-					parent.window->clear();
-					parent.createRectangle(j, n - i);
-					parent.window->display();
+					parent.sortSettings(j, n - 1);
 
 					if (_vec[j] > _vec[j + 1])
 						swap(&_vec[j], &_vec[j + 1]);
@@ -80,8 +89,6 @@ private:
 		Sort& parent;
 		InsertionSort(Sort& _parent) : parent(_parent) {};
 
-
-
 		void insertionSort(std::vector<int>& _vec) {
 			int key, j;
 
@@ -92,31 +99,18 @@ private:
 					_vec[j + 1] = _vec[j];
 					j--;
 
-					//////////////////
 					if (parent.replay == true) break;
-					parent.control();
-
-					parent.window->clear();
-					parent.createRectangle(j, i);
-					parent.window->display();
-					////////////////////
+					parent.sortSettings(j, i);
 				}
 				_vec[j + 1] = key;
 
-				//////////////
 				if (i == _vec.size() - 1) {
-
-					parent.window->clear();
-					parent.createRectangle(j, i);
-					parent.window->display();
+					parent.sortSettings(j, i);
 				}
-				//////////////
 
 
 			}
 		}
-
-
 
 	};
 	class SelectionSort {
@@ -144,23 +138,16 @@ private:
 					if (_vec[minIndex] > _vec[j])
 						minIndex = j;
 
-					///////////////////////////////
-					parent.control();
-
-					parent.window->clear();
-					parent.createRectangle(j, i);
-					parent.window->display();
-					///////////////////////////////
+					if (parent.replay == true) break;
+					parent.sortSettings(j, i);
 				}
 				swap(&_vec[i], &_vec[minIndex]);
 			}
 
 		}
 
-
-
 	};
-	class QuickSort { /// CALISMIYOR
+	class QuickSort {
 
 	public:
 
@@ -182,7 +169,11 @@ private:
 			for (int j = low; j < high; j++) {
 
 				if (_vec[j] < pivot)
+				{
 					i++;
+					if (parent.replay == true) break;
+					swap(&_vec[i], &_vec[j]);
+				}
 
 			}
 			swap(&_vec[i + 1], &_vec[high]);
@@ -193,22 +184,14 @@ private:
 
 		void quickSort(std::vector<int>& _vec, int low, int high) {
 			if (low < high) {
-
 				int pi = partition(_vec, low, high);
+
 
 				quickSort(_vec, low, pi - 1);
 				quickSort(_vec, pi + 1, high);
 
-
-
 			}
-			///////////////////////////////
-			parent.control();
-
-			parent.window->clear();
-			parent.createRectangle(0, 0);
-			parent.window->display();
-			///////////////////////////////
+			parent.sortSettings(0, 0);
 		}
 
 
@@ -253,13 +236,11 @@ private:
 
 					j++;
 				}
-
-				parent.control();
-				parent.window->clear();
-				parent.createRectangle(k, k);
-				parent.window->display();
 				k++;
 
+
+				if (parent.replay == true) break;
+				parent.sortSettings(k, k);
 			}
 
 			while (i < n1) {
@@ -274,31 +255,57 @@ private:
 				k++;
 
 			}
-			parent.control();
-			parent.window->clear();
-			parent.createRectangle(k, k);
-			parent.window->display();
-			k++;
 
+			k++;
 		}
 
 		void mergeSort(std::vector<int>& _vec, int low, int high) {
 
 
 			if (low < high) {
-				int mid = (high + low) / 2;
 
+				int mid = (high + low) / 2;
 				mergeSort(_vec, low, mid);
 				mergeSort(_vec, mid + 1, high);
 				merge(_vec, low, mid, high);
 
-
 			}
-
 		}
-
+	};
+	enum SortsEnum {
+		chooseBubbleSort = 1,
+		chooseInsertionSort = 2,
+		chooseSelectionSort = 3,
+		chooseQuickSort = 4,
+		chooseMergeSort = 5
 	};
 
+
+	SortsEnum sortChoose = chooseBubbleSort;
+
+	void sortThem(std::vector<int>& _vec, SortsEnum _sortChoose = chooseBubbleSort) {
+
+		switch (_sortChoose)
+		{
+		case Sort::chooseBubbleSort:
+			bubbleSortClass.bubbleSort(_vec);
+			break;
+		case Sort::chooseInsertionSort:
+			insertionSortClass.insertionSort(_vec);
+			break;
+		case Sort::chooseSelectionSort:
+			selectionSortClass.selectionSort(_vec);
+			break;
+		case Sort::chooseQuickSort:
+			quickSortClass.quickSort(_vec, 0, _vec.size() - 1);
+			break;
+		case Sort::chooseMergeSort:
+			mergeSortClass.mergeSort(_vec, 0, _vec.size() - 1);
+			break;
+		default:
+			break;
+		}
+	}
 	void createRectangle(int j, int n) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
@@ -348,9 +355,35 @@ private:
 
 		}
 	}
-
+	void controlSettings(int sleepMS) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleepMS));
+		replay = true;
+		shuffle(vec);
+		sortThem(vec, sortChoose);
+	}
 	void control() {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+			sortChoose = chooseBubbleSort;
+			controlSettings(250);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+			sortChoose = chooseInsertionSort;
+			controlSettings(250);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
+			sortChoose = chooseSelectionSort;
+			controlSettings(250);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
+			sortChoose = chooseQuickSort;
+			controlSettings(250);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
+			sortChoose = chooseMergeSort;
+			controlSettings(250);
+
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			delay > 0 ? delay -= 100 : delay = 0;
@@ -362,10 +395,8 @@ private:
 			std::cout << delay << std::endl;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
-			std::this_thread::sleep_for(std::chrono::microseconds(500));
-			replay = true;
-			bubbleSortClass.shuffle(vec);
-			bubbleSortClass.bubbleSort(vec);
+			controlSettings(500);
+			sortThem(vec, sortChoose);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 			std::this_thread::sleep_for(std::chrono::microseconds(500));
@@ -374,7 +405,7 @@ private:
 			{
 				vec.push_back(std::rand());
 			}
-
+			std::cout << "Array size = " << vec.size() << std::endl;
 			replay = true;
 			arrSize = vec.size();
 			largest = *std::max_element(vec.begin(), vec.end());
@@ -388,6 +419,7 @@ private:
 			{
 				vec.pop_back();
 			}
+			std::cout << "Array size = " << vec.size() << std::endl;
 			replay = true;
 			arrSize = vec.size();
 			largest = *std::max_element(vec.begin(), vec.end());
@@ -396,7 +428,6 @@ private:
 
 		}
 	}
-
 
 
 public:
@@ -416,19 +447,7 @@ public:
 		quickSortClass(*this),
 		mergeSortClass(*this) {};
 
-
-
 	bool render() {
-		//bubbleSortClass.bubbleSort(vec);
-		//insertionSortClass.insertionSort(vec);
-		//selectionSortClass.selectionSort(vec);
-		quickSortClass.quickSort(vec, 0, vec.size() - 1);
-		//mergeSortClass.mergeSort(vec, 0, vec.size() - 1);
-
-
-
-
-
 
 		while (window->isOpen()) {
 			control();
@@ -442,15 +461,14 @@ public:
 			if (replay == true) {
 				std::this_thread::sleep_for(std::chrono::microseconds(500));
 				replay = false;
-				//bubbleSortClass.bubbleSort(vec);
-				//insertionSortClass.insertionSort(vec);
-				//selectionSortClass.selectionSort(vec);
-				quickSortClass.quickSort(vec, 0, vec.size() - 1);
-				//mergeSortClass.mergeSort(vec, 0, vec.size() - 1);
-
-
-
+				sortThem(vec, sortChoose);
 			}
+			else {
+				window->clear();
+				createRectangle(0, 0);
+				window->display();
+			}
+
 		}
 		return true;
 	}
@@ -463,6 +481,7 @@ int main(void) {
 
 	std::vector<int> vec;
 	std::srand(time(0));
+
 	for (int i = 0; i < 20; i++)
 	{
 		vec.push_back(std::rand());
