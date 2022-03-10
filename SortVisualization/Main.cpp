@@ -64,6 +64,7 @@ private:
 
 		void swap(int* x, int* y)
 		{
+
 			int temp = *x;
 			*x = *y;
 			*y = temp;
@@ -75,6 +76,7 @@ private:
 
 			for (int i = 0; i < n - 1; i++)
 			{
+				if (parent.replay == true) return;
 				for (int j = 0; j < n - i - 1; j++) {
 					if (parent.replay == true) return;
 					parent.sortSettings(j, n - i);
@@ -106,6 +108,9 @@ private:
 					j--;
 
 				}
+
+				if (parent.replay == true) return;
+				parent.sortSettings(j, i);
 
 				_vec[j + 1] = key;
 
@@ -173,14 +178,15 @@ private:
 			if (parent.replay == true) return(i + 1);
 
 			for (int j = low; j < high; j++) {
+				if (parent.replay == true) return(i + 1);
 
 				if (_vec[j] < pivot)
 				{
 					i++;
-					if (parent.replay == true) return(i + 1);
 					swap(&_vec[i], &_vec[j]);
 				}
-
+				parent.sortSettings(j, j);
+				if (parent.replay == true) return(i + 1);
 			}
 			swap(&_vec[i + 1], &_vec[high]);
 
