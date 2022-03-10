@@ -4,6 +4,7 @@
 #include <time.h>
 #include <chrono>
 #include <thread>
+#include <fstream>
 
 
 class Sort {
@@ -12,7 +13,8 @@ private:
 	int W = 720;
 	int H = 480;
 	sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(W, H), "Sort Visualization", sf::Style::Close | sf::Style::Titlebar);
-
+	sf::Text* text = new sf::Text;
+	sf::Font* font = new sf::Font;
 	std::vector<int> vec;
 	int arrSize;
 	int largest = *std::max_element(vec.begin(), vec.end());
@@ -47,6 +49,8 @@ private:
 		control();
 		window->clear();
 		createRectangle(cyanRectangle, yellowRectangle);
+		*text = setText(sortChooseTxt);
+		window->draw(*text);
 		window->display();
 	}
 
@@ -71,10 +75,9 @@ private:
 
 			for (int i = 0; i < n - 1; i++)
 			{
-				if (parent.replay == true) break;
 				for (int j = 0; j < n - i - 1; j++) {
-					if (parent.replay == true) break;
-					parent.sortSettings(j, n - 1);
+					if (parent.replay == true) return;
+					parent.sortSettings(j, n - i);
 
 					if (_vec[j] > _vec[j + 1])
 						swap(&_vec[j], &_vec[j + 1]);
@@ -96,12 +99,14 @@ private:
 				key = _vec[i];
 				j = i - 1;
 				while (j >= 0 && _vec[j] > key) {
+					if (parent.replay == true) return;
+					parent.sortSettings(j, i);
+
 					_vec[j + 1] = _vec[j];
 					j--;
 
-					if (parent.replay == true) break;
-					parent.sortSettings(j, i);
 				}
+
 				_vec[j + 1] = key;
 
 				if (i == _vec.size() - 1) {
@@ -138,7 +143,7 @@ private:
 					if (_vec[minIndex] > _vec[j])
 						minIndex = j;
 
-					if (parent.replay == true) break;
+					if (parent.replay == true) return;
 					parent.sortSettings(j, i);
 				}
 				swap(&_vec[i], &_vec[minIndex]);
@@ -165,13 +170,14 @@ private:
 
 			int pivot = _vec[high];
 			int i = low - 1;
+			if (parent.replay == true) return(i + 1);
 
 			for (int j = low; j < high; j++) {
 
 				if (_vec[j] < pivot)
 				{
 					i++;
-					if (parent.replay == true) break;
+					if (parent.replay == true) return(i + 1);
 					swap(&_vec[i], &_vec[j]);
 				}
 
@@ -184,6 +190,7 @@ private:
 
 		void quickSort(std::vector<int>& _vec, int low, int high) {
 			if (low < high) {
+				if (parent.replay == true) return;
 				int pi = partition(_vec, low, high);
 
 
@@ -205,6 +212,7 @@ private:
 		MergeSort(Sort& _parent) : parent(_parent) {};
 
 		void merge(std::vector<int>& _vec, int low, int mid, int high) {
+			if (parent.replay == true) return;
 			int i, j, k;
 
 			int n1 = mid - low + 1;
@@ -239,8 +247,8 @@ private:
 				k++;
 
 
-				if (parent.replay == true) break;
 				parent.sortSettings(k, k);
+				if (parent.replay == true) return;
 			}
 
 			while (i < n1) {
@@ -263,7 +271,7 @@ private:
 
 
 			if (low < high) {
-
+				if (parent.replay == true) return;
 				int mid = (high + low) / 2;
 				mergeSort(_vec, low, mid);
 				mergeSort(_vec, mid + 1, high);
@@ -282,6 +290,7 @@ private:
 
 
 	SortsEnum sortChoose = chooseBubbleSort;
+	std::string sortChooseTxt = "BubbleSort";
 
 	void sortThem(std::vector<int>& _vec, SortsEnum _sortChoose = chooseBubbleSort) {
 
@@ -306,8 +315,25 @@ private:
 			break;
 		}
 	}
+	sf::Text setText(sf::String _string) {
+
+		if (!font->loadFromFile("Fonts/arial.ttf"))
+		{
+			throw("Couldn't load the font");
+		}
+
+
+		text->setFont(*font);
+		text->setString(_string);
+		text->setCharacterSize(24);
+		text->setFillColor(sf::Color::White);
+		text->setPosition(sf::Vector2f(0.f, 0.f));
+
+		return (*text);
+	}
 	void createRectangle(int j, int n) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+
 
 		for (int x = 0; x < arrSize; x++)
 		{
@@ -359,26 +385,35 @@ private:
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleepMS));
 		replay = true;
 		shuffle(vec);
-		sortThem(vec, sortChoose);
 	}
 	void control() {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+			std::this_thread::sleep_for(std::chrono::microseconds(500));
+			sortChooseTxt = "BubbleSort";
 			sortChoose = chooseBubbleSort;
 			controlSettings(250);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+			std::this_thread::sleep_for(std::chrono::microseconds(500));
+			sortChooseTxt = "InsertionSort";
 			sortChoose = chooseInsertionSort;
 			controlSettings(250);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
+			std::this_thread::sleep_for(std::chrono::microseconds(500));
+			sortChooseTxt = "SelectionSort";
 			sortChoose = chooseSelectionSort;
 			controlSettings(250);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
+			std::this_thread::sleep_for(std::chrono::microseconds(500));
+			sortChooseTxt = "QuickSort";
 			sortChoose = chooseQuickSort;
 			controlSettings(250);
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
+			std::this_thread::sleep_for(std::chrono::microseconds(500));
+			sortChooseTxt = "MergeSort";
 			sortChoose = chooseMergeSort;
 			controlSettings(250);
 
@@ -450,6 +485,7 @@ public:
 	bool render() {
 
 		while (window->isOpen()) {
+
 			control();
 
 			sf::Event event;
@@ -466,6 +502,7 @@ public:
 			else {
 				window->clear();
 				createRectangle(0, 0);
+				window->draw(*text);
 				window->display();
 			}
 
